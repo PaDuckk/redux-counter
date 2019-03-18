@@ -1,12 +1,63 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import * as serviceWorker from './serviceWorker';
+import { createStore } from 'redux';
 
-ReactDOM.render(<App />, document.getElementById('root'));
+// Action type
+const INCREMENT = "INCREMENT";
+// const INCREMENT = "INCREMENT";
 
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://bit.ly/CRA-PWA
-serviceWorker.unregister();
+
+// Action
+function increase (diff) {
+    return {
+        type: INCREMENT,
+        addBy: diff
+    }
+}
+const initialState = {
+    value: 0
+}
+// Reducer
+const counterReducer = (state = initialState, action) => {
+    switch (action.type) {
+        case INCREMENT:
+            return Object.assign({}, state, {
+                value: state.value + action.addBy
+            });
+        default: 
+            return state;
+    }
+}
+
+// store
+const store = createStore(counterReducer);
+
+// counter app
+class App extends React.Component {
+    
+    onClick = () => {
+        this.props.store.dispatch(increase(1));
+    }
+
+    
+    render() {
+        const { store } = this.props;
+        const style = {
+            position: 'fixed',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            cursor: 'pointer'
+        }
+        return(
+            <div onClick={this.onClick} style={style}>
+                <h1>{store.getState().value}</h1>
+            </div>
+        );
+    }
+}
+
+const render = () => ReactDOM.render(<App store={store}/>, document.getElementById('root'));
+store.subscribe(render);
+
+render();
